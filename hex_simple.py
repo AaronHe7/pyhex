@@ -13,11 +13,11 @@ from sgf_parse import SgfTree
 points on the board
 """
 
-PTS = '.xo'
-EMPTY, BLACK, WHITE = 0, 1, 2
-ECH, BCH, WCH = PTS[EMPTY], PTS[BLACK], PTS[WHITE]
+PTS = '.xo' # empty, x, o characters
+EMPTY, BLACK, WHITE = 0, 1, 2 # numeric values
+ECH, BCH, WCH = PTS[EMPTY], PTS[BLACK], PTS[WHITE] # characters for empty, black, and white
 
-
+# returns opposite color
 def oppCH(ch):
   if ch== BCH: return WCH
   elif ch== WCH: return BCH
@@ -38,13 +38,14 @@ def point_to_cubic(pt, C):
 def cubic_to_point(vec, C):
   return vec[2] * C + vec[0]
 
+# rotates sixty degrees counter-clockwise
 def cubic_rotate_60_cc(vec):
   return np.array([-vec[1], -vec[2], -vec[0]])
 
-def coord_to_point(r, c, C): 
+def coord_to_point(r, c, C):
   return c + r*C
 
-def point_to_coord(p, C): 
+def point_to_coord(p, C):
   return divmod(p, C)
 
 def point_to_alphanum(p, C):
@@ -57,7 +58,7 @@ def alphanum_to_point(an, C):
 def change_str(s, where, what):
   return s[:where] + what + s[where+1:]
 
-def char_to_color(c): 
+def char_to_color(c):
   return PTS.index(c)
 
 escape_ch           = '\033['
@@ -68,7 +69,7 @@ stonecolors         = (textcolor, escape_ch + '0;35m', escape_ch + '0;32m')
 class UnionFind:
   def __init__(self):
     self.parents = {}
-
+  # merges groups with elem1 and elem2
   def union(self, elem1, elem2):
     e1 = self.find(elem1)
     e2 = self.find(elem2)
@@ -76,9 +77,11 @@ class UnionFind:
       return
     self.parents[e2] = e1;
 
+  # gets the group id of elem
   def find(self, elem):
     while elem in self.parents:
       p = self.parents[elem]
+      # set the group's parent higher up on the tree if possible
       if p in self.parents:
         self.parents[elem] = self.parents[p]
       elem = p
@@ -152,7 +155,7 @@ class Pattern:
     return ch != ECH and (x == self.C and z == -1) or (x == -1 and z == self.R)
 
 
-class Position: # hex board 
+class Position: # hex board
   def __init__(self, rows, cols):
     self.R, self.C, self.n = rows, cols, rows*cols
     self.brd = PTS[EMPTY]*self.n
@@ -739,7 +742,7 @@ class Position: # hex board
       score[v_i[1]] += 5*v_i[0]
     counts = sorted([(score[i], i) for i in range(len(self.brd))], reverse=True)
     if show_ranks:
-      print("Cells:Ranks", " ".join([point_to_alphanum(rc[1], self.C) + ":" + str(rc[0]) for rc in counts])) 
+      print("Cells:Ranks", " ".join([point_to_alphanum(rc[1], self.C) + ":" + str(rc[0]) for rc in counts]))
     return [i[1] for i in counts]
 
   def midpoint(self):
@@ -801,7 +804,7 @@ class Position: # hex board
 
   def win_move(self, ptm, captured={BCH:set(), WCH:set()}):
     # assume neither player has won yet
-    optm = oppCH(ptm) 
+    optm = oppCH(ptm)
     calls = 1
     ovc = set()
 
@@ -881,7 +884,7 @@ class Position: # hex board
     for j in range(self.R): # rows
       pretty += ' '*j + paint(str(1+j)) + ' ' + paint(WCH)
       for k in range(self.C): # columns
-        pretty += ' ' + paint([self.brd[coord_to_point(j,k,self.C)]]) 
+        pretty += ' ' + paint([self.brd[coord_to_point(j,k,self.C)]])
       pretty += ' ' + paint(WCH) + '\n'
 
     pretty += '  '  + ' ' * self.R + '+'
@@ -966,7 +969,7 @@ class Position: # hex board
       st = time.time()
       wm, calls, vc = self.win_move(ch)
       out = '\n' + ch + '-to-move: '
-      out += (ch if wm else oppCH(ch)) + ' wins' 
+      out += (ch if wm else oppCH(ch)) + ' wins'
       out += (' ... ' if wm else ' ') + wm + '\n'
       out += str(calls) + ' calls\n'
       out += "%.4f" % (time.time() - st) + 's \n'
@@ -1045,7 +1048,7 @@ def interact():
         p.undo()
 
     elif cmd[0]=='?':
-      if len(cmd) == 2 and cmd[1] in {BCH, WCH}: 
+      if len(cmd) == 2 and cmd[1] in {BCH, WCH}:
           print(p.msg(cmd[1]))
 
     #elif cmd[0] == 'l':
@@ -1144,7 +1147,7 @@ def interact():
       fname = cmd[1]
       f = None
       try:
-        f = open(fname, 'r')              
+        f = open(fname, 'r')
       except:
         print("Failed to open file.")
         continue
