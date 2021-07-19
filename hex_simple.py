@@ -31,6 +31,7 @@ index positions for     board:    0 1 2       <- row 0
                                     6 7 8       <- row 2
 """
 
+# converts point to "cubic coordinates". explanation: https://www.redblobgames.com/grids/hexagons/#coordinates-cube
 def point_to_cubic(pt, C):
   z, x = divmod(pt, C)
   return np.array([x, -x-z, z])
@@ -42,12 +43,14 @@ def cubic_to_point(vec, C):
 def cubic_rotate_60_cc(vec):
   return np.array([-vec[1], -vec[2], -vec[0]])
 
+# converts a row column pair to a single number
 def coord_to_point(r, c, C):
   return c + r*C
 
 def point_to_coord(p, C):
   return divmod(p, C)
 
+# converts a point to a letter-number description
 def point_to_alphanum(p, C):
   r, c = point_to_coord(p, C)
   return 'abcdefghi'[c] + '123456789'[r]
