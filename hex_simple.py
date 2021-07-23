@@ -19,6 +19,7 @@ ECH, BCH, WCH = PTS[EMPTY], PTS[BLACK], PTS[WHITE] # characters for empty, black
 
 # returns opposite color
 def oppCH(ch):
+  """returns the opposite color"""
   if ch== BCH: return WCH
   elif ch== WCH: return BCH
   else: assert(False)
@@ -59,8 +60,10 @@ def alphanum_to_point(an, C):
   return (ord(an[0]) - ord('a')) + (int(an[1:])-1)*C
 
 def change_str(s, where, what):
+  """modifies string 's' at index 'where' with 'what'"""
   return s[:where] + what + s[where+1:]
 
+# converts a cell number type to a character
 def char_to_color(c):
   return PTS.index(c)
 
@@ -69,6 +72,7 @@ colorend, textcolor = escape_ch + '0m', escape_ch + '0;37m'
 stonecolors         = (textcolor, escape_ch + '0;35m', escape_ch + '0;32m')
 
 
+# implementation of a Disjoint-set data structure
 class UnionFind:
   def __init__(self):
     self.parents = {}
@@ -78,7 +82,7 @@ class UnionFind:
     e2 = self.find(elem2)
     if e1 == e2:
       return
-    self.parents[e2] = e1;
+    self.parents[e2] = e1
 
   # gets the group id of elem
   def find(self, elem):
@@ -88,7 +92,7 @@ class UnionFind:
       if p in self.parents:
         self.parents[elem] = self.parents[p]
       elem = p
-    return elem;
+    return elem
 
   def __str__(self):
     return str(self.parents)
@@ -103,7 +107,7 @@ class Pattern:
     # If a char in chars == ECH it is treated as a cell that would be dead or captured if the pattern matches.
     self.offsets = offsets
     self.deltas = [self.offsets]
-    self.chars = chars;
+    self.chars = chars
     self.R = rows
     self.C = cols
 
@@ -158,12 +162,14 @@ class Pattern:
     return ch != ECH and (x == self.C and z == -1) or (x == -1 and z == self.R)
 
 
-class Position: # hex board
+class Position:
+  """Hex board, hex state, and hex AI class"""
   def __init__(self, rows, cols):
     self.R, self.C, self.n = rows, cols, rows*cols
     self.brd = PTS[EMPTY]*self.n
     self.H = []
 
+    # list of lists representing the neighbor indices for each cell
     self.nbrs = []
     for r in range(self.R):
       for c in range(self.C):
@@ -176,6 +182,7 @@ class Position: # hex board
         if r < self.R-1:           nbs.append(coord_to_point(r+1, c,   self.C))
         self.nbrs.append(set(nbs))
 
+    # sets representing indices of of cells along the 4 sides
     self.LFT_COL, self.RGT_COL, self.TOP_ROW, self.BTM_ROW = set(), set(), set(), set()
     for r in range(self.R):
       self.LFT_COL.add(coord_to_point(r, 0, self.C))
@@ -376,6 +383,7 @@ class Position: # hex board
     # Does not find all virtual connections but can detect 432s.
 
     def sort2(l):
+      """sorts tuple of length 2"""
       if l[0] < l[1]:
         return l
       return (l[1], l[0])
@@ -511,6 +519,7 @@ class Position: # hex board
     return c.find(side1) == c.find(side2)
 
   def requestmove(self, cmd):
+    """make move from string command"""
     ret, cmd = False, cmd.split()
     if len(cmd) != 2:
       print('invalid command')
@@ -869,6 +878,7 @@ class Position: # hex board
     return '', calls, ovc
 
   def showboard(self):
+    """prints out the board"""
     def paint(s):
       pt = ''
       for j in s:
@@ -1020,6 +1030,7 @@ def printmenu():
   print('  [return]                            quit')
 
 
+# a function that allows you to interact with this program via the terminal
 def interact():
   print()
   p = Position(4, 4)
